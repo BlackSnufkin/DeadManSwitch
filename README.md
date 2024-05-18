@@ -1,3 +1,6 @@
+
+![dms_logo](https://github.com/BlackSnufkin/DeadManSwitch/assets/61916899/da391913-393a-44e8-90fd-0cce402e552b)
+
 # Dead Man Switch
 
 A Rust application that activates a Dead Man Switch to secure your computer in case of an emergency. The application supports multiple trigger mechanisms, including a Telegram bot, network broadcasts, and USB device detection. When triggered, the Dead Man Switch dismounts VeraCrypt volumes and performs a forced hard shutdown of the system.
