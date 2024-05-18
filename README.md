@@ -90,9 +90,6 @@ To manually trigger the Dead Man Switch, use the `--trigger` flag:
 - `rusb`: USB device detection and communication
 - `winapi`, `x11`, and `cocoa`: System-specific libraries for screen size detection
 
-## License
-
-This project is licensed under the [MIT License](LICENSE).
 
 ## Disclaimer
 
