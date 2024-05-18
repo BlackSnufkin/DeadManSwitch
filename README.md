@@ -72,6 +72,7 @@ To manually trigger the Dead Man Switch, use the `--trigger` flag:
 ### Telegram Bot Command
 - Modify the `Command` enum in the code to change the Telegram bot command that triggers the Dead Man Switch.
 - Update the corresponding command handler in the `start_bot` function to match the new command.
+- Update the loop on `main` function line 493 to match youre selected command
 
 ### Network Broadcast Message
 - Change the expected broadcast message in the `listen_for_broadcast` and in `trigger_dms` functions to customize the message that triggers the Dead Man Switch over the network.
