@@ -21,8 +21,8 @@ A Rust application that activates a Dead Man Switch to secure your computer in c
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/dead-man-switch.git
-   cd dead-man-switch
+   git clone https://github.com/BlackSnufkin/DeadManSwitch.git
+   cd DeadManSwitch
    ```
 
 2. Update the Telegram Bot API token in the code:
@@ -40,7 +40,7 @@ A Rust application that activates a Dead Man Switch to secure your computer in c
 Run the application with the desired trigger mode:
 
 ```bash
-./target/release/dead-man-switch --mode <mode>
+./target/release/DeadManSwitch --mode <mode>
 ```
 
 Available modes:
@@ -52,7 +52,7 @@ Available modes:
 To manually trigger the Dead Man Switch, use the `--trigger` flag:
 
 ```bash
-./target/release/dead-man-switch --trigger
+./target/release/DeadManSwitch --trigger
 ```
 
 ## Customization
