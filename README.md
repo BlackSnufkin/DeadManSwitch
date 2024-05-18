@@ -95,4 +95,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Disclaimer
 
-This application is intended for educational and testing purposes only. Use it responsibly and ensure that you have the necessary permissions and legal rights to perform actions like dismounting volumes and shutting down the system. The authors of this project are not responsible for any misuse or damage caused by this application.
+- This application is provided "as is" without any warranty, express or implied. The authors of this project shall not be held liable for any damage, data loss, or other consequences arising from the use or misuse of this application.
+- By using this application, you acknowledge that you are using it at your own risk. 
+- The authors of this project cannot be held responsible for any corruption of VeraCrypt containers, data loss, system instability, or any other adverse effects that may occur due to the use of this application.
+- Use this application wisely and exercise caution. Always maintain backups of your important data and ensure that you have a thorough understanding of the application's functionality before using it on critical systems.
