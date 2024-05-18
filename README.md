@@ -62,7 +62,8 @@ To manually trigger the Dead Man Switch, use the `--trigger` flag:
 - Update the corresponding command handler in the `start_bot` function to match the new command.
 
 ### Network Broadcast Message
-- Change the expected broadcast message in the `listen_for_broadcast` function to customize the message that triggers the Dead Man Switch over the network.
+- Change the expected broadcast message in the `listen_for_broadcast` and in `trigger_dms` functions to customize the message that triggers the Dead Man Switch over the network.
+
 
 ### USB Device Detection
 - Use the code from the [USB_mon](https://github.com/BlackSnufkin/Rusty-Playground/tree/main/USB_mon) project to find the vendor and product IDs of the desired USB device.
