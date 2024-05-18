@@ -4,11 +4,17 @@ A Rust application that activates a Dead Man Switch to secure your computer in c
 
 ## Features
 
-- Trigger the Dead Man Switch using a Telegram bot, network broadcasts, or by connecting a specific USB device
+- Trigger theAc Dead Man Switch using a Telegram bot, network broadcasts, or by connecting a specific USB device
 - Dismount VeraCrypt volumes to secure confidential data
 - Perform a forced hard shutdown of the system
 - Display an emergency alert window with a countdown timer
 - Customizable trigger commands and USB device detection
+
+## Recommendations
+
+For optimal data protection, it is highly recommended to encrypt your system partition using VeraCrypt. This ensures that all your sensitive data remains secure even if the computer is compromised or stolen. By combining the Dead Man Switch application with a VeraCrypt-encrypted system partition, you can achieve a robust security setup that safeguards your data in case of an emergency.
+
+To encrypt your system partition with VeraCrypt, please follow the official VeraCrypt documentation and guides available on their website.
 
 ## Prerequisites
 
