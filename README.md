@@ -1,5 +1,5 @@
 
-![dms_logo_rs](https://github.com/BlackSnufkin/DeadManSwitch/assets/61916899/46b3c66a-cb94-49f7-a91d-8125fc1f6227)
+![dms_logo (1)](https://github.com/BlackSnufkin/DeadManSwitch/assets/61916899/1aac9adb-6579-42d5-81db-06ea3a7c0e8d)
 
 
 # Dead Man Switch
