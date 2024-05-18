@@ -4,11 +4,12 @@ A Rust application that activates a Dead Man Switch to secure your computer in c
 
 ## Features
 
-- Trigger theAc Dead Man Switch using a Telegram bot, network broadcasts, or by connecting a specific USB device
+- Trigger the Dead Man Switch using a Telegram bot, network broadcasts, or by connecting a specific USB device
 - Dismount VeraCrypt volumes to secure confidential data
 - Perform a forced hard shutdown of the system
 - Display an emergency alert window with a countdown timer
 - Customizable trigger commands and USB device detection
+- Cross-platform compatibility worked on Debian and Windows systems, expected to work on macOS (didnt tested yet)
 
 ## Recommendations
 
