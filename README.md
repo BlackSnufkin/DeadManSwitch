@@ -85,4 +85,3 @@ This project is licensed under the [MIT License](LICENSE).
 ## Disclaimer
 
 This application is intended for educational and testing purposes only. Use it responsibly and ensure that you have the necessary permissions and legal rights to perform actions like dismounting volumes and shutting down the system. The authors of this project are not responsible for any misuse or damage caused by this application.
-```
