@@ -18,7 +18,7 @@ use teloxide::types::{Message as BotMessage};
 use clap::{Parser};
 use rusb::{Context, Device, UsbContext, Error};
 use std::collections::HashSet;
-
+use cocoa::base::nil;
 
 
 struct DeadManSwitchApp {
@@ -190,10 +190,9 @@ fn get_screen_size() -> (f64, f64) {
 
 fn deadmanswitch_alert() {
     let size = get_screen_size();
-
     let settings = Settings {
         window: window::Settings {
-            size: (size.0.try_into().unwrap(), size.1.try_into().unwrap()),
+            size: (size.0 as u32, size.1 as u32),
             resizable: false,
             decorations: false,
             always_on_top: true,
@@ -205,11 +204,8 @@ fn deadmanswitch_alert() {
         },
         ..Default::default()
     };
-
     DeadManSwitchApp::run(settings).unwrap();
 }
-
-
 
 
 #[derive(BotCommands, Clone)]
@@ -280,6 +276,53 @@ fn listen_for_broadcast(latest_message: Arc<Mutex<Option<String>>>) {
     }
 }
 
+fn monitor_usb_devices() {
+    let context = Context::new().expect("Failed to create USB context");
+    let mut known_devices: HashSet<DeviceInfo> = HashSet::new();
+    
+    info!("[+] USB Device Trigger is ON");
+    loop {
+        let devices = context.devices().expect("Failed to get USB devices");
+        for device in devices.iter() {
+            let device_info = DeviceInfo::from_device(&device).expect("Failed to get device info");
+            if known_devices.insert(device_info.clone()) {
+                
+                if usb_trigger(&device).expect("Failed to check dead man switch") {
+                    trigger_dms();
+                    dead_man_switch();
+                    std::process::exit(0);
+                }
+            }
+        }
+        std::thread::sleep(Duration::from_secs(1));
+    }
+}
+
+#[derive(PartialEq, Eq, Hash, Clone, Debug)]
+struct DeviceInfo {
+    vendor_id: u16,
+    product_id: u16,
+    bus_number: u8,
+    device_address: u8,
+}
+
+impl DeviceInfo {
+    fn from_device<T: UsbContext>(device: &Device<T>) -> Result<Self, Error> {
+        let device_desc = device.device_descriptor()?;
+        Ok(Self {
+            vendor_id: device_desc.vendor_id(),
+            product_id: device_desc.product_id(),
+            bus_number: device.bus_number(),
+            device_address: device.address(),
+        })
+    }
+}
+
+fn usb_trigger<T: UsbContext>(device: &Device<T>) -> Result<bool, Error> {
+    let device_desc = device.device_descriptor()?;
+    Ok(device_desc.vendor_id() == 0x090c && device_desc.product_id() == 0x1000)
+}
+
 
 fn get_veracrypt_path() -> String {
     if cfg!(windows) {
@@ -310,6 +353,7 @@ fn dismount_veracrypt_volumes() {
         Err(e) => error!("Error dismounting VeraCrypt volumes: {}", e),
     }
 }
+
 
 fn forced_hard_shutdown() {
     let output = if cfg!(windows) {
@@ -358,54 +402,6 @@ fn dead_man_switch() {
     });
     deadmanswitch_alert();
 }
-
-fn monitor_usb_devices() {
-    let context = Context::new().expect("Failed to create USB context");
-    let mut known_devices: HashSet<DeviceInfo> = HashSet::new();
-    
-    info!("[+] USB Device Trigger is ON");
-    loop {
-        let devices = context.devices().expect("Failed to get USB devices");
-        for device in devices.iter() {
-            let device_info = DeviceInfo::from_device(&device).expect("Failed to get device info");
-            if known_devices.insert(device_info.clone()) {
-                
-                if usb_trigger(&device).expect("Failed to check dead man switch") {
-                    trigger_dms();
-                    dead_man_switch();
-                    std::process::exit(0);
-                }
-            }
-        }
-        std::thread::sleep(Duration::from_secs(1));
-    }
-}
-
-#[derive(PartialEq, Eq, Hash, Clone, Debug)]
-struct DeviceInfo {
-    vendor_id: u16,
-    product_id: u16,
-    bus_number: u8,
-    device_address: u8,
-}
-
-impl DeviceInfo {
-    fn from_device<T: UsbContext>(device: &Device<T>) -> Result<Self, Error> {
-        let device_desc = device.device_descriptor()?;
-        Ok(Self {
-            vendor_id: device_desc.vendor_id(),
-            product_id: device_desc.product_id(),
-            bus_number: device.bus_number(),
-            device_address: device.address(),
-        })
-    }
-}
-
-fn usb_trigger<T: UsbContext>(device: &Device<T>) -> Result<bool, Error> {
-    let device_desc = device.device_descriptor()?;
-    Ok(device_desc.vendor_id() == 0x090c && device_desc.product_id() == 0x1000)
-}
-
 
 
 #[derive(clap::Parser)]
