@@ -14,7 +14,7 @@ A Rust application that activates a Dead Man Switch to secure your computer in c
 - Perform a forced hard shutdown of the system
 - Display an emergency alert window with a countdown timer
 - Customizable trigger commands and USB device detection
-- Cross-platform compatibility worked on Debian and Windows systems, expected to work on macOS (didnt tested yet)
+- Cross-platform compatibility worked on Linux Windows and macOS
 
 ## Recommendations
 
