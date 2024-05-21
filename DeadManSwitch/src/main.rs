@@ -1,10 +1,14 @@
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
+use clap::{Parser};
 use iced::alignment::Horizontal;
 use iced::alignment::Vertical;
 use iced::window;
 use iced::{executor, Application, Column, Command as IcedCommand, Container, Element, Length, Settings, Text};
 use log::{error, info, warn, LevelFilter};
+use rusb::{Context, Device, UsbContext, Error};
 use simplelog::{ColorChoice, CombinedLogger, Config, TermLogger, TerminalMode};
-
+use std::collections::HashSet;
 use std::net::{SocketAddr, UdpSocket};
 use std::process::Command as OsCommand;
 use std::sync::{Arc, Mutex};
@@ -12,13 +16,8 @@ use std::thread;
 use std::time::Duration;
 use std::time::{Instant};
 use teloxide::prelude::*;
-use teloxide::utils::command::BotCommands;
-use tokio::task;
 use teloxide::types::{Message as BotMessage};
-use clap::{Parser};
-use rusb::{Context, Device, UsbContext, Error};
-use std::collections::HashSet;
-
+use teloxide::utils::command::BotCommands;
 
 
 struct DeadManSwitchApp {
@@ -157,15 +156,19 @@ fn get_screen_size() -> (i32, i32) {
 }
 
 #[cfg(target_os = "linux")]
+#[link(name = "X11")]
+extern "C" {}
+#[cfg(target_os = "linux")]
 fn get_screen_size() -> (i32, i32) {
-    extern crate x11;
+    use x11::xlib;
+
     unsafe {
-        let display = x11::xlib::XOpenDisplay(std::ptr::null());
-        let screen_num = x11::xlib::XDefaultScreen(display);
-        let width = x11::xlib::XDisplayWidth(display, screen_num);
-        let height = x11::xlib::XDisplayHeight(display, screen_num);
-        x11::xlib::XCloseDisplay(display);
-        (width, height)
+        let display = xlib::XOpenDisplay(std::ptr::null_mut());
+        let screen_num = xlib::XDefaultScreen(display);
+        let width = xlib::XDisplayWidth(display, screen_num);
+        let height = xlib::XDisplayHeight(display, screen_num);
+        xlib::XCloseDisplay(display);
+        (width as i32, height as i32)
     }
 }
 
@@ -207,6 +210,8 @@ fn deadmanswitch_alert() {
     };
     DeadManSwitchApp::run(settings).unwrap();
 }
+
+
 
 
 #[derive(BotCommands, Clone)]
@@ -255,7 +260,6 @@ async fn start_bot(latest_message: Arc<Mutex<Option<String>>>) {
 }
 
 
-
 fn listen_for_broadcast(latest_message: Arc<Mutex<Option<String>>>) {
     let server_address: SocketAddr = "0.0.0.0:45370".parse().unwrap();
     let socket = UdpSocket::bind(server_address).expect("Failed to bind socket");
@@ -275,6 +279,84 @@ fn listen_for_broadcast(latest_message: Arc<Mutex<Option<String>>>) {
         }
         buffer = [0; 4096];
     }
+}
+
+
+fn get_veracrypt_path() -> String {
+    if cfg!(windows) {
+        "C:\\Program Files\\VeraCrypt\\VeraCrypt.exe".to_string()
+    } else if cfg!(target_os = "macos") {
+        "/Applications/VeraCrypt.app/Contents/MacOS/VeraCrypt".to_string()
+    } else {
+        "veracrypt".to_string()
+    }
+}
+
+
+fn dismount_veracrypt_volumes() {
+    let veracrypt_path = get_veracrypt_path();
+
+    let output = if cfg!(windows) {
+        OsCommand::new(veracrypt_path)
+            .args(&["/d", "/f", "/w", "/q", "/s"])
+            .output()
+    } else {
+        OsCommand::new(veracrypt_path)
+            .args(&["-d", "-f"])
+            .output()
+    };
+
+    match output {
+        Ok(_) => info!("[+] VeraCrypt volumes dismounted successfully."),
+        Err(e) => error!("Error dismounting VeraCrypt volumes: {}", e),
+    }
+}
+
+fn forced_hard_shutdown() {
+    let output = if cfg!(windows) {
+        OsCommand::new("shutdown")
+            .args(&["/p", "/f"])
+            .output()
+    } else if cfg!(target_os = "macos") {
+        OsCommand::new("halt")
+            .arg("-q")
+            .output()
+    } else {
+        OsCommand::new("systemctl")
+            .arg("poweroff")
+            .arg("-f")
+            .output()
+    };
+
+    match output {
+        Ok(_) => info!("[+] System is performing a forced hard shutdown."),
+        Err(e) => error!("Error performing a forced hard shutdown: {}", e),
+    }
+}
+
+
+fn trigger_dms() {
+    warn!("[!] Dead Man Switch has been triggered.");
+    warn!("[!] Sending Trigger message to the Local Network.");
+
+    let message = "dms";
+    let server_address: SocketAddr = "255.255.255.255:45370".parse().unwrap();
+    let socket = UdpSocket::bind("0.0.0.0:0").expect("Failed to bind socket");
+    socket.set_broadcast(true).expect("Failed to set broadcast");
+    socket
+        .send_to(message.as_bytes(), server_address)
+        .expect("Failed to send message");
+}
+
+fn dead_man_switch() {
+    warn!("[!] Dead Man Switch has been triggered.");
+    warn!("[!] Dismounting VeraCrypt volumes and locking the computer.");
+    thread::spawn(move || {
+        thread::sleep(Duration::from_secs(3));
+        dismount_veracrypt_volumes();
+        forced_hard_shutdown();
+    });
+    deadmanswitch_alert();
 }
 
 fn monitor_usb_devices() {
@@ -324,94 +406,6 @@ fn usb_trigger<T: UsbContext>(device: &Device<T>) -> Result<bool, Error> {
     Ok(device_desc.vendor_id() == 0x090c && device_desc.product_id() == 0x1000)
 }
 
-
-fn get_veracrypt_path() -> String {
-    if cfg!(windows) {
-        "C:\\Program Files\\VeraCrypt\\VeraCrypt.exe".to_string()
-    } else if cfg!(target_os = "macos") {
-        "/Applications/VeraCrypt.app/Contents/MacOS/VeraCrypt".to_string()
-    } else {
-        "veracrypt".to_string()
-    }
-}
-
-
-fn dismount_veracrypt_volumes() {
-    let veracrypt_path = get_veracrypt_path();
-
-    let output = if cfg!(windows) {
-        OsCommand::new(veracrypt_path)
-            .args(&["/d", "/f", "/w", "/q", "/s"])
-            .output()
-    } else {
-        OsCommand::new(veracrypt_path)
-            .args(&["-d", "-f"])
-            .output()
-    };
-
-    match output {
-        Ok(_) => info!("[+] VeraCrypt volumes dismounted successfully."),
-        Err(e) => error!("Error dismounting VeraCrypt volumes: {}", e),
-    }
-}
-
-
-fn forced_hard_shutdown() {
-    let output = if cfg!(windows) {
-        OsCommand::new("shutdown")
-            .args(&["/p", "/f"])
-            .output()
-    } else if cfg!(target_os = "macos") {
-        OsCommand::new("halt")
-            .arg("-q")
-            .output()
-    } else {
-        OsCommand::new("systemctl")
-            .arg("poweroff")
-            .arg("-f")
-            .output()
-    };
-
-    match output {
-        Ok(_) => info!("[+] System is performing a forced hard shutdown."),
-        Err(e) => error!("Error performing a forced hard shutdown: {}", e),
-    }
-}
-
-
-fn trigger_dms() {
-    warn!("[!] Dead Man Switch has been triggered.");
-    warn!("[!] Sending Trigger message to the Local Network.");
-
-    let message = "dms";
-    let server_address: SocketAddr = "255.255.255.255:45370".parse().unwrap();
-    let socket = UdpSocket::bind("0.0.0.0:0").expect("Failed to bind socket");
-    socket.set_broadcast(true).expect("Failed to set broadcast");
-    socket
-        .send_to(message.as_bytes(), server_address)
-        .expect("Failed to send message");
-}
-
-fn dead_man_switch() {
-    warn!("[!] Dead Man Switch has been triggered.");
-    warn!("[!] Dismounting VeraCrypt volumes and locking the computer.");
-    thread::spawn(move || {
-        thread::sleep(Duration::from_secs(3));
-        dismount_veracrypt_volumes();
-        forced_hard_shutdown();
-    });
-    deadmanswitch_alert();
-}
-
-
-#[derive(clap::Parser)]
-struct Args {
-    #[clap(short, long, default_value = "all")]
-    mode: String,
-
-    #[clap(short, long)]
-    trigger: bool,
-}
 
 
 #[derive(clap::Parser)]
@@ -475,6 +469,12 @@ async fn main() {
         std::process::exit(1);
     }
 
+    use notify_rust::{Notification};
+    Notification::new()
+        .summary("Dead Man Switch 🏴‍☠️")
+        .body("The dead man's switch has been activated and armed. ⚔️")
+        .timeout(0) // this however is
+        .show();
 
     if args.trigger {
         trigger_dms();
@@ -494,3 +494,4 @@ async fn main() {
         }
     }
 }
+
