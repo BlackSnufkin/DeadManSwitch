@@ -472,7 +472,7 @@ async fn main() {
     Notification::new()
         .summary("Dead Man Switch 🏴‍☠️")
         .body("The dead man's switch has been activated and armed. ⚔️")
-        .timeout(0) // this however is
+        .timeout(0)
         .show();
 
     if args.trigger {
