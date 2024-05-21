@@ -361,9 +361,8 @@ fn forced_hard_shutdown() {
             .args(&["/p", "/f"])
             .output()
     } else if cfg!(target_os = "macos") {
-        OsCommand::new("osascript")
-            .arg("-e")
-            .arg("tell app \"System Events\" to shut down")
+        OsCommand::new("halt")
+            .arg("-q")
             .output()
     } else {
         OsCommand::new("systemctl")
