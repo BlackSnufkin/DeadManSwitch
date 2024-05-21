@@ -1,4 +1,5 @@
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+// Uncomment this when you want to hide the window console
+//#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use clap::{Parser};
 use iced::alignment::Horizontal;
