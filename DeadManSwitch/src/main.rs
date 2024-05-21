@@ -18,7 +18,7 @@ use teloxide::types::{Message as BotMessage};
 use clap::{Parser};
 use rusb::{Context, Device, UsbContext, Error};
 use std::collections::HashSet;
-use cocoa::base::nil;
+
 
 
 struct DeadManSwitchApp {
@@ -173,6 +173,7 @@ fn get_screen_size() -> (i32, i32) {
 fn get_screen_size() -> (f64, f64) {
     extern crate cocoa;
     extern crate core_graphics;
+    use cocoa::base::nil;
     use cocoa::appkit::NSScreen;
     use core_graphics::display::CGDisplay;
     use objc::runtime::YES;
