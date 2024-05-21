@@ -1,5 +1,5 @@
-// Uncomment this when you want to hide the window console
 //#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+// Uncomment above line when you want to hide the console window
 
 use clap::{Parser};
 use iced::alignment::Horizontal;
@@ -211,8 +211,6 @@ fn deadmanswitch_alert() {
     };
     DeadManSwitchApp::run(settings).unwrap();
 }
-
-
 
 
 #[derive(BotCommands, Clone)]
