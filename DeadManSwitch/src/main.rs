@@ -468,12 +468,30 @@ async fn main() {
         std::process::exit(1);
     }
 
-    use notify_rust::{Notification};
+    #[cfg(target_os = "windows")]
     Notification::new()
         .summary("Dead Man Switch 🏴‍☠️")
         .body("The dead man's switch has been activated and armed. ⚔️")
-        .timeout(0)
+        .timeout(0) 
         .show();
+
+
+    #[cfg(target_os = "linux")]
+        OsCommand::new("notify-send")
+        .env("DISPLAY", ":0.0")
+        .arg("Dead Man Switch 🏴‍☠️")
+        .arg("The dead man's switch has been activated and armed. ⚔️")
+        .output()
+        .expect("Failed to execute notify-send command");
+
+
+    #[cfg(target_os = "macos")]
+    OsCommand::new("osascript")
+        .arg("-e")
+        .arg("display notification \"The dead man's switch has been activated and armed. ⚔️\" with title \"Dead Man Switch 🏴‍☠️\"")
+        .output()
+        .expect("Failed to execute osascript command");
+
 
     if args.trigger {
         trigger_dms();
