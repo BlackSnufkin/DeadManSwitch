@@ -59,6 +59,7 @@ Available modes:
 - `net`: Listen for network broadcasts to trigger the Dead Man Switch
 - `bot`: Use a Telegram bot to trigger the Dead Man Switch
 - `usb`: Monitor USB devices and trigger the Dead Man Switch when a specific device is connected
+- `flic`: Listen to Flic Server event trigger upon flick button click
 - `all`: Enable all trigger modes (default)
 
 To manually trigger the Dead Man Switch, use the `--trigger` flag:
