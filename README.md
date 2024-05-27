@@ -104,16 +104,6 @@ lazy_static::lazy_static! {
 - Trigger Event: Press and hold the Flic button to activate the dead man switch.
 
 
-## Dependencies
-
-- `iced`: GUI library for Rust
-- `log` and `simplelog`: Logging functionality
-- `teloxide`: Telegram bot library
-- `clap`: Command-line argument parsing
-- `rusb`: USB device detection and communication
-- `winapi`, `x11`, and `cocoa`: System-specific libraries for screen size detection
-
-
 ## Disclaimer
 
 - This application is provided "as is" without any warranty, express or implied. The authors of this project shall not be held liable for any damage, data loss, or other consequences arising from the use or misuse of this application.
