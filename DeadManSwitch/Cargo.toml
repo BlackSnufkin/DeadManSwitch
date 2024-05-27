@@ -1,6 +1,6 @@
 [package]
 name = "DeadManSwitch"
-version = "0.3.7"
+version = "0.2.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -21,6 +21,9 @@ iced = "0.4.2"
 clap = { version = "4.0.32", features = ["derive"] }
 rusb = "0.9.1"
 notify-rust = "4.11.0"
+lazy_static = "1.4.0"
+flic-rust-client = { git = "https://github.com/bloznelis/flic-rust-client.git" }
+anyhow = "*"
 
 [target.'cfg(target_os = "windows")'.dependencies]
 winapi = { version = "0.3", features = ["wingdi","winuser"] }
