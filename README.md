@@ -39,7 +39,7 @@ To encrypt your system partition with VeraCrypt, please follow the official Vera
 
 2. Update the Telegram Bot API token in the code:
 
-   Replace `<TELEGRAM BOT API TOKEN>` with your actual bot token in the `start_bot` function.
+   Replace `<TELEGRAM BOT API TOKEN>` with your actual bot token in the `DeadManSwitchConfig` struct.
 
 3. Build the application:
 
@@ -67,20 +67,41 @@ To manually trigger the Dead Man Switch, use the `--trigger` flag:
 ./target/release/DeadManSwitch --trigger
 ```
 
-## Customization
+## Integration
 
+To set up the DeadManSwitchConfig, update the configuration struct located in Lines 61-72 with your specific details.
+
+```rust
+lazy_static::lazy_static! {
+    static ref CONFIG: DeadManSwitchConfig = DeadManSwitchConfig::new(
+        "<TELEGRAM BOT API TOKEN>".to_string(), // Telegram bot token
+        45370, // Broadcast port
+        "trigger_dms".to_string(), // Broadcast message
+        "execute".to_string(), // Telegram command
+        0x090c, // USB vendor ID
+        0x1000, // USB product ID
+        "<FLIC BUTTON SERVER>".to_string(), // Flic button server IP
+        5551, // Flic button server port
+    );
+}
+```
 ### Telegram Bot Command
-- Modify the `Command` enum in the code to change the Telegram bot command that triggers the Dead Man Switch.
-- Update the corresponding command handler in the `start_bot` function to match the new command.
-- Update the loop on `main` function line 493 to match youre selected command
+- Create a Telegram Bot: Set up your Telegram bot using BotFather on Telegram.
+- Trigger Command: Use the command /dms execute to trigger the dead man switch.
 
 ### Network Broadcast Message
-- Change the expected broadcast message in the `listen_for_broadcast` and in `trigger_dms` functions to customize the message that triggers the Dead Man Switch over the network.
-
+- Modify Broadcast Message: Update the broadcast_message field in the DeadManSwitchConfig struct with your desired message.
+- Trigger Event: Send the specific broadcast message over the network to activate the dead man switch.
 
 ### USB Device Detection
-- Use the code from the [USB_mon](https://github.com/BlackSnufkin/Rusty-Playground/tree/main/USB_mon) project to find the vendor and product IDs of the desired USB device.
-- Update the `usb_trigger` function in the Dead Man Switch code with the specific vendor and product IDs to customize the USB device detection.
+- Identify USB Device: Utilize the USB_mon project to find the vendor and product IDs for your USB device.
+- Trigger Event: Connect the USB device to trigger the dead man switch.
+
+### Flic Button
+- Set Up Flic Server: Use either the Linux Flic Server or the Windows Flic Server to pair your Flic button.
+- Configure Flic Button: Update the flic_ip and flic_port fields in the DeadManSwitchConfig struct with your Flic server's IP and port.
+- Trigger Event: Press and hold the Flic button to activate the dead man switch.
+
 
 ## Dependencies
 
