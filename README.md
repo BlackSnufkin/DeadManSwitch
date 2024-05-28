@@ -37,11 +37,7 @@ To encrypt your system partition with VeraCrypt, please follow the official Vera
    cd DeadManSwitch
    ```
 
-2. Update the Telegram Bot API token in the code:
-
-   Replace `<TELEGRAM BOT API TOKEN>` with your actual bot token in the `DeadManSwitchConfig` struct.
-
-3. Build the application:
+2. Build the application:
 
    ```bash
    cargo build --release
