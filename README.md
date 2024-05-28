@@ -95,7 +95,7 @@ lazy_static::lazy_static! {
 - Trigger Event: Send the specific broadcast message over the network to activate the dead man switch.
 
 ### USB Device Detection
-- Identify USB Device: Utilize the (USB_mon)[https://github.com/BlackSnufkin/Rusty-Playground/tree/main/USB_mon] project to find the vendor and product IDs for your USB device.
+- Identify USB Device: Utilize the [USB_mon](https://github.com/BlackSnufkin/Rusty-Playground/tree/main/USB_mon) project to find the vendor and product IDs for your USB device.
 - Trigger Event: Connect the USB device to trigger the dead man switch.
 
 ### Flic Button
