@@ -5,11 +5,11 @@
 
 # Dead Man Switch
 
-A Rust application that activates a Dead Man Switch to secure your computer in case of an emergency. The application supports multiple trigger mechanisms, including a Telegram bot, network broadcasts, and USB device detection. When triggered, the Dead Man Switch dismounts VeraCrypt volumes and performs a forced hard shutdown of the system.
+A Rust application that activates a Dead Man Switch to secure your computer in case of an emergency. The application supports multiple trigger mechanisms, including a Telegram bot, network broadcasts, and USB device detection Flic Button and more. When triggered, the Dead Man Switch dismounts VeraCrypt volumes and performs a forced hard shutdown of the system.
 
 ## Features
 
-- Trigger the Dead Man Switch using a Telegram bot, network broadcasts, or by connecting a specific USB device
+- Trigger the Dead Man Switch using a Telegram bot, network broadcasts, USB device connection, Flic Button
 - Dismount VeraCrypt volumes to secure confidential data
 - Perform a forced hard shutdown of the system
 - Display an emergency alert window with a countdown timer
@@ -95,7 +95,7 @@ lazy_static::lazy_static! {
 - Trigger Event: Send the specific broadcast message over the network to activate the dead man switch.
 
 ### USB Device Detection
-- Identify USB Device: Utilize the USB_mon project to find the vendor and product IDs for your USB device.
+- Identify USB Device: Utilize the (USB_mon)[https://github.com/BlackSnufkin/Rusty-Playground/tree/main/USB_mon] project to find the vendor and product IDs for your USB device.
 - Trigger Event: Connect the USB device to trigger the dead man switch.
 
 ### Flic Button
