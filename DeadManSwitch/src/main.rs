@@ -219,6 +219,8 @@ impl DeadManSwitchApp {
                 (width, height)
             }
         }
+        #[link(name = "X11")]
+        extern "C" {}
         #[cfg(target_os = "linux")]
         {
             use x11::xlib;
@@ -243,10 +245,10 @@ impl DeadManSwitchApp {
                 let screen = NSScreen::mainScreen(nil);
                 if screen != nil {
                     let rect = NSScreen::frame(screen);
-                    return (rect.size.width, rect.size.height);
+                    return (rect.size.width as i32, rect.size.height as i32);
                 }
             }
-            (0.0, 0.0)
+            (0, 0)
         }
     }
 
