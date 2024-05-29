@@ -219,6 +219,8 @@ impl DeadManSwitchApp {
                 (width, height)
             }
         }
+        
+        #[cfg(target_os = "linux")]
         #[link(name = "X11")]
         extern "C" {}
         #[cfg(target_os = "linux")]
