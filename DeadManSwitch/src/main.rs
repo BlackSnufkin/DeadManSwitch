@@ -235,6 +235,7 @@ impl DeadManSwitchApp {
                 (width as i32, height as i32)
             }
         }
+        
         #[cfg(target_os = "macos")]
         {
             extern crate cocoa;
@@ -580,7 +581,41 @@ impl DeadManSwitchAction {
         let app = DeadManSwitchApp { remaining_seconds: 3, flash_emergency: true };
         app.run_alert();
     }
+    
+    fn send_notification(&self) {
+        #[cfg(target_os = "linux")]
+        {
+            use std::process::Command as OsCommand;
+            OsCommand::new("notify-send")
+                .env("DISPLAY", ":0.0")
+                .arg("Dead Man Switch 🏴‍☠️")
+                .arg("The dead man's switch has been activated and armed. ⚔️")
+                .output()
+                .expect("Failed to execute notify-send command");
+        }
+
+        #[cfg(target_os = "windows")]
+        {
+            use notify_rust::Notification;
+            Notification::new()
+                .summary("Dead Man Switch 🏴‍☠️")
+                .body("The dead man's switch has been activated and armed. ⚔️")
+                .timeout(0)
+                .show();
+        }
+
+        #[cfg(target_os = "macos")]
+        {
+            use std::process::Command as OsCommand;
+            OsCommand::new("osascript")
+                .arg("-e")
+                .arg("display notification \"The dead man's switch has been activated and armed. ⚔️\" with title \"Dead Man Switch 🏴‍☠️\"")
+                .output()
+                .expect("Failed to execute osascript command");
+        }
+    }
 }
+
 
 impl Clone for DeadManSwitchAction {
     fn clone(&self) -> Self {
@@ -668,20 +703,7 @@ async fn main() {
         std::process::exit(1);
     }
 
-    #[cfg(target_os = "linux")]
-    OsCommand::new("notify-send")
-        .env("DISPLAY", ":0.0")
-        .arg("Dead Man Switch 🏴‍☠️")
-        .arg("The dead man's switch has been activated and armed. ⚔️")
-        .output()
-        .expect("Failed to execute notify-send command");
-
-    #[cfg(target_os = "windows")]
-    Notification::new()
-        .summary("Dead Man Switch 🏴‍☠️")
-        .body("The dead man's switch has been activated and armed. ⚔️")
-        .timeout(0)
-        .show();
+    DeadManSwitchAction.send_notification();
 
     loop {
         if let Ok(_) = trigger_rx.try_recv() {
