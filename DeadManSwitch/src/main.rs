@@ -1,5 +1,6 @@
 //#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 // Uncomment above line when you want to hide the console window
+
 use anyhow::Result;
 use clap::{Parser};
 use flic_rust_client::{ClickType, ConnectionStatus, Event, Command as FlicCommand, event_handler, FlicClient, LatencyMode};
@@ -7,7 +8,6 @@ use iced::alignment::{Horizontal, Vertical};
 use iced::window;
 use iced::{executor, Application, Column, Command as IcedCommand, Container, Element, Length, Settings, Text};
 use log::{error, info, warn, LevelFilter};
-use notify_rust::Notification;
 use rusb::{Context, Device, UsbContext, Error};
 use simplelog::{ColorChoice, CombinedLogger, Config as LogConfig, TermLogger, TerminalMode};
 use std::collections::HashSet;
@@ -219,7 +219,7 @@ impl DeadManSwitchApp {
                 (width, height)
             }
         }
-        
+
         #[cfg(target_os = "linux")]
         #[link(name = "X11")]
         extern "C" {}
@@ -235,7 +235,7 @@ impl DeadManSwitchApp {
                 (width as i32, height as i32)
             }
         }
-        
+
         #[cfg(target_os = "macos")]
         {
             extern crate cocoa;
@@ -581,7 +581,7 @@ impl DeadManSwitchAction {
         let app = DeadManSwitchApp { remaining_seconds: 3, flash_emergency: true };
         app.run_alert();
     }
-    
+
     fn send_notification(&self) {
         #[cfg(target_os = "linux")]
         {
@@ -615,7 +615,6 @@ impl DeadManSwitchAction {
         }
     }
 }
-
 
 impl Clone for DeadManSwitchAction {
     fn clone(&self) -> Self {
@@ -743,3 +742,4 @@ async fn main() {
         }
     }
 }
+
