@@ -1,108 +1,218 @@
+# Dead Man Switch
 
 ![dms_logo](https://github.com/BlackSnufkin/DeadManSwitch/assets/61916899/097bc494-f245-4b0a-8a71-9971708fc98e)
 
+## Overview
+
+Dead Man Switch is a cross-platform security application written in Rust that automatically protects sensitive data in emergency situations. The application monitors multiple trigger mechanisms and executes immediate system lockdown procedures when activated, including encrypted volume dismounting and controlled system shutdown.
+
+### Core Features
+
+- **Heartbeat Timer**: Automatic trigger on missed check-in intervals
+- **Telegram Integration**: Remote control via secure messaging
+- **Network Triggers**: LAN broadcast-based activation
+- **USB Detection**: Hardware-based triggering
+- **Flic Button Support**: Physical activation mechanism
+- **VeraCrypt Integration**: Automatic encrypted volume dismounting
+- **Cross-Platform**: Windows, Linux, and macOS compatibility
+
+## Requirements
+
+- Rust 1.82.0 or later ([Installation Guide](https://rustup.rs/))
+- VeraCrypt ([Download](https://www.veracrypt.fr/))
+- Telegram Bot Token (optional, for remote features)
 
 
-# Dead Man Switch
+## Configuration
 
-A Rust application that activates a Dead Man Switch to secure your computer in case of an emergency. The application supports multiple trigger mechanisms, including a Telegram bot, network broadcasts, and USB device detection Flic Button and more. When triggered, the Dead Man Switch dismounts VeraCrypt volumes and performs a forced hard shutdown of the system.
+Edit `src/config.rs` to customize settings:
+```rust
+pub fn default() -> Result<Self> {
+    Self::new(
+        "YOUR_TELEGRAM_BOT_TOKEN".to_string(),
+        3600,                                     // Heartbeat timeout (seconds)
+        45370,                                    // Network broadcast port
+        "trigger_dms".to_string(),               // Network trigger message
+        "execute".to_string(),                   // Manual trigger command
+        0x090c,                                  // USB vendor ID
+        0x1000,                                  // USB product ID
+        "auto".to_string(),                      // Flic IP (auto-detected)
+        5551,                                    // Flic port
+    )
+}
+```
 
-## Features
+### Obtaining Telegram Bot Token
 
-- Trigger the Dead Man Switch using a Telegram bot, network broadcasts, USB device connection, Flic Button
-- Dismount VeraCrypt volumes to secure confidential data
-- Perform a forced hard shutdown of the system
-- Display an emergency alert window with a countdown timer
-- Customizable trigger commands and USB device detection
-- Cross-platform compatibility worked on Linux Windows and macOS
-
-## Recommendations
-
-For optimal data protection, it is highly recommended to encrypt your system partition using VeraCrypt. This ensures that all your sensitive data remains secure even if the computer is compromised or stolen. By combining the Dead Man Switch application with a VeraCrypt-encrypted system partition, you can achieve a robust security setup that safeguards your data in case of an emergency.
-
-To encrypt your system partition with VeraCrypt, please follow the official VeraCrypt documentation and guides available on their website.
-
-## Prerequisites
-
-- Rust programming language (1.55.0 or later)
-- VeraCrypt installed on the system
-- Telegram Bot API token (for the Telegram bot trigger)
-
-## Installation
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/BlackSnufkin/DeadManSwitch.git
-   cd DeadManSwitch
-   ```
-
-2. Build the application:
-
-   ```bash
-   cargo build --release
-   ```
+1. Contact `@BotFather` on Telegram
+2. Execute `/newbot` command
+3. Follow setup instructions
+4. Copy provided API token
+5. Insert token into configuration file
 
 ## Usage
 
-Run the application with the desired trigger mode:
+Basic form:
 
-```bash
-./target/release/DeadManSwitch --mode <mode>
-```
+    ./DeadManSwitch --mode <modes> [--trigger]
+
+- `--mode`: comma-separated list of modes. If omitted, `all` is used.
+- `--trigger`: execute actions immediately and show the alert UI, without waiting for any external trigger.
+
+### Modes
 
 Available modes:
-- `net`: Listen for network broadcasts to trigger the Dead Man Switch
-- `bot`: Use a Telegram bot to trigger the Dead Man Switch
-- `usb`: Monitor USB devices and trigger the Dead Man Switch when a specific device is connected
-- `flic`: Listen to Flic Server event trigger upon flick button click
-- `all`: Enable all trigger modes (default)
 
-To manually trigger the Dead Man Switch, use the `--trigger` flag:
+- `timer` – Telegram heartbeat timer
+- `bot`   – Telegram manual trigger
+- `net`   – UDP broadcast listener
+- `usb`   – USB VID/PID trigger
+- `flic`  – Flic button trigger
+- `all`   – All of the above
 
-```bash
-./target/release/DeadManSwitch --trigger
-```
+Examples:
 
-## Integration
+    # All triggers (default)
+    ./DeadManSwitch
 
-To set up the DeadManSwitchConfig, update the configuration struct located in Lines 61-72 with your specific details.
+    # Only Telegram heartbeat + USB
+    ./DeadManSwitch --mode timer,usb
 
+    # Only network broadcast
+    ./DeadManSwitch --mode net
+
+    # Manual trigger only
+    ./DeadManSwitch --trigger
+
+
+## Trigger Mechanisms
+
+### 1. Heartbeat Timer
+
+Automatically triggers after specified timeout period without check-in.
+
+**Configuration:**
 ```rust
-lazy_static::lazy_static! {
-    static ref CONFIG: DeadManSwitchConfig = DeadManSwitchConfig::new(
-        "<TELEGRAM BOT API TOKEN>".to_string(), // Telegram bot token
-        45370, // Broadcast port
-        "trigger_dms".to_string(), // Broadcast message
-        "execute".to_string(), // Telegram command
-        0x090c, // USB vendor ID
-        0x1000, // USB product ID
-        "<FLIC BUTTON SERVER>".to_string(), // Flic button server IP
-        5551, // Flic button server port
-    );
-}
+telegram_heartbeat_timeout: 3600  // seconds
 ```
-### Telegram Bot Command
-- Create a Telegram Bot: Set up your Telegram bot using BotFather on Telegram.
-- Trigger Command: Use the command /dms execute to trigger the dead man switch.
 
-### Network Broadcast Message
-- Modify Broadcast Message: Update the broadcast_message field in the DeadManSwitchConfig struct with your desired message.
-- Trigger Event: Send the specific broadcast message over the network to activate the dead man switch.
+**Execution:**
+```bash
+./DeadManSwitch --mode timer
+```
 
-### USB Device Detection
-- Identify USB Device: Utilize the [USB_mon](https://github.com/BlackSnufkin/Rusty-Playground/tree/main/USB_mon) project to find the vendor and product IDs for your USB device.
-- Trigger Event: Connect the USB device to trigger the dead man switch.
+**Telegram Commands:**
+- `/alive` - Reset countdown timer
+- `/status` - Query time remaining
 
-### Flic Button
-- Set Up Flic Server: Use either the Linux Flic Server or the Windows Flic Server to pair your Flic button.
-- Configure Flic Button: Update the flic_ip and flic_port fields in the DeadManSwitchConfig struct with your Flic server's IP and port.
-- Trigger Event: Press and hold the Flic button to activate the dead man switch.
+**Behavior:**
+- Monitors for periodic heartbeat signals
+- Sends Telegram alert on timeout
+- Executes lockdown procedures automatically
+
+
+
+### 2. Telegram Bot
+
+Remote manual control interface.
+
+**Setup:**
+1. Create bot via @BotFather
+2. Add bot to channel with "Post Messages" permission
+3. Update configuration with token
+
+**Execution:**
+```bash
+./DeadManSwitch --mode bot
+```
+
+**Command:**
+- `/dms execute` - Manual trigger activation
+
+
+
+### 3. Network Broadcast
+
+LAN-based triggering mechanism.
+
+**Configuration:**
+```rust
+broadcast_port: 45370
+broadcast_message: "trigger_dms"
+```
+
+**Execution:**
+```bash
+# Protected machine
+./DeadManSwitch --mode net
+
+# Trigger from network
+echo "trigger_dms" | nc -u -b 255.255.255.255 45370
+```
+
+
+
+### 4. USB Device Detection
+
+Hardware-based activation on device connection.
+
+**Identifying Device IDs:**
+```bash
+git clone https://github.com/BlackSnufkin/Rusty-Playground.git
+cd Rusty-Playground/USB_mon
+cargo run
+# Connect device and note vendor:product IDs
+```
+
+**Configuration:**
+```rust
+usb_vendor_id: 0x090c
+usb_product_id: 0x1000
+```
+
+**Execution:**
+```bash
+./DeadManSwitch --mode usb
+```
+
+---
+
+### 5. Flic Button
+
+Physical button activation mechanism.
+
+**Server Installation:**
+- Linux: [Flic SDK for Linux](https://github.com/50ButtonsEach/fliclib-linux-hci)
+- Windows: [Flic Windows SDK](https://github.com/50ButtonsEach/fliclib-windows)
+
+**Button Pairing:**
+```bash
+./simpleclient scan
+./simpleclient connect <button_address>
+```
+
+**Configuration:**
+```rust
+flic_ip: "192.168.1.242".to_string()  // or "auto" for detection
+```
+
+**Execution:**
+```bash
+./DeadManSwitch --mode flic
+```
+
+**Activation:** Press and hold button
+
+
+## Recommended Use with VeraCrypt
+
+- Encrypt your volumes/partitions with VeraCrypt
+- Configure `ActionExecutor` to dismount and shutdown on trigger
+- Test everything on non-critical systems before using it on real data
 
 
 ## Disclaimer
 
-- This application is provided "as is" without any warranty, express or implied. The authors of this project shall not be held liable for any damage, data loss, or other consequences arising from the use or misuse of this application.
-- By using this application, you acknowledge that you are using it at your own risk. 
-- The authors of this project cannot be held responsible for any corruption of VeraCrypt containers, data loss, system instability, or any other adverse effects that may occur due to the use of this application.
-- Use this application wisely and exercise caution. Always maintain backups of your important data and ensure that you have a thorough understanding of the application's functionality before using it on critical systems.
+- Provided without any warranty
+- You are responsible for any data loss or damage
+- Always keep backups and test configuration before using this on important systems

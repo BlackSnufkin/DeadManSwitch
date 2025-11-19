@@ -1,32 +1,38 @@
 [package]
 name = "DeadManSwitch"
-version = "0.2.2"
+version = "0.2.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [profile.release]
-opt-level = "z"     # Optimize for size.
-lto = true          # Enable Link Time Optimization
-codegen-units = 1   # Reduce number of codegen units to increase optimizations.
-panic = "abort"     # Abort on panic
-strip = true        # Automatically strip symbols from the binary.
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
 
 [dependencies]
 log = "0.4.14"
 simplelog = "0.10.0"
 teloxide = { version = "0.12", features = ["macros"] }
-tokio = { version =  "1.24", features = ["rt-multi-thread", "macros"] }
+tokio = { version = "1.24", features = ["rt-multi-thread", "macros"] }
 whoami = "1.1.1"
-iced = "0.4.2"
+eframe = "0.25"
 clap = { version = "4.0.32", features = ["derive"] }
 rusb = "0.9.1"
 notify-rust = "4.11.0"
 lazy_static = "1.4.0"
 flic-rust-client = { git = "https://github.com/bloznelis/flic-rust-client.git" }
 anyhow = "*"
+local-ip-address = "0.5.1"
+regex = "1.5.4"
+thiserror = "1.0"
+
+[dependencies.tokio-stream]
+version = "0.1.15"
+features = ["sync"]
 
 [target.'cfg(target_os = "windows")'.dependencies]
-winapi = { version = "0.3", features = ["wingdi","winuser"] }
+winapi = { version = "0.3", features = ["wingdi", "winuser"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 x11 = "2.19.0"
@@ -35,7 +41,3 @@ x11 = "2.19.0"
 cocoa = "0.24.0"
 core-graphics = "0.22.2"
 objc = "0.2"
-
-[dependencies.tokio-stream]
-version = "0.1.15"
-features = ["sync"]
